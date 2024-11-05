@@ -1,38 +1,529 @@
-.App {
-  text-align: center;
+.container{
+    margin: 0;
+    width: 100%;
+    height: 100%;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.header{
+    margin: 0;
+    height: 70px;
+    width: 100%;
+    background-color: #1b3573;
+    color: white;
+    display: flex;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+.Scroll-Sports{
+    gap: 5px;
+    margin-top: 20px;
+    list-style: none;
+    display: flex;
+    padding: 0;
+    justify-content: center;
+}
+
+
+.Scroll-Sports li a{
+    user-select: none;
+    cursor: pointer;
+    color: white;
+    text-transform: uppercase;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    transition: background 0.4s ease, transform 0.4s ease, box-shadow 0.4s;
+}
+
+.Scroll-Sports li a:hover{
+    background: rgba(255,255,255,.1);
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.Scroll-Sports li a:active{
+    transform: scale(1);
+    box-shadow: none;
+}
+
+.logo{
+    margin-left: 20px;
+}
+
+.profile{
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+    margin: 10px;
+    display: flex;
+    flex-direction: column;
+    margin-left: 50px;
+}
+
+.deposito{
+    cursor: pointer;
+    margin-top: 10px;
+    margin-left: 20px;
+    height: 50px;
+    width: 100px;
+    background-color: aliceblue;
+    color: #1b3573;
+    border-radius: 10px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.4s ease, transform 0.4s ease, box-shadow 0.4s;
+}
+
+.deposito a{
+    line-height: 50px;
+    font-size: 15px;
+    text-transform: uppercase;
+    font-weight: 500;
+
+}
+
+.deposito:hover{
+    background: rgba(255,255,255,.8);
+    transform: scale(1.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.deposito:active{
+    transform: scale(1);
+    box-shadow: none;
+}
+
+.info-game{
+    height: 140px;
+    width: 280px;
+    background-color: white;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    flex-direction:column ;
+    border-radius: 3px;
+    box-shadow: 0px 3px 5px rgba(1, 1, 1, .2);
+}
+
+.header-game{
+    width: 95%;
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    
+}
+
+.header-game div{
+    display: flex;
+    
+}
+.header-game img{
+    margin-top:8px;
+    margin-right:5px
+}
+.header-game h2{
+    font-size: 10px;
+    color: #969696;
+    font-weight: 400;
+}
+
+.vs-icons{
+    text-align: center;
+    display: flex;
+    width: 95%;
+    height: 48px;
+    justify-content: center;
+}
+
+.vs-icons img{
+    margin-top: 5px;
+    height: 30px;
+    width: auto;
+}
+
+.vs-icons .time{
+    display: flex;
+    gap: 2px;
+}
+
+.time h3{
+    margin: auto;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.vs-icons span{
+    margin-top: 10px;
+    font-weight: 600;
+    margin-left: 7px;
+    margin-right: 7px;
+}
+
+.odds{
+    display: flex;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    font-size: 14px;
+    width: 95%;
+    justify-content: space-evenly;
+    height: 32px;
+    gap: 10px;
+}
+
+.result{
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    width: 90%;
+    justify-content: center;
+    line-height: 3px;
+    margin-bottom: 5px;
+}
+.line-span{
+    border-bottom: 1px solid rgba(1, 1, 1, .2);
+    flex: 1;
+    margin-bottom: 6px;
+}
+
+.resultado-partida{
+    margin: 5px;
+    font-size: 12px;
+    font-weight: 400;
+    color: #969696;
+}
+.odd{
+    cursor: pointer;
+    border: 1px solid #969696;
+    background-color: #f3f3f3;
+    padding: 4px;
+    width: 100%;
+    text-align: center;
+    justify-content: space-between;
+    font-size: 14px;
+    font-weight: 400;
+    display: flex;
+}
+
+.odd:hover{
+    background-color: #e0f1f1;
+}
+
+.odd div{
+    color: #969696;
+}
+
+.Matches{
+    user-select: none;
+    margin: 10px;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.Banca{
+    width: 500px;
+    height: 500px;
+    position: absolute;
+    top: 60px;
+    left: 500px;
+    background-color: #f3f3f3;
+    border-radius: 10px;
+    box-shadow: 10px 10px 10px rgba(0,0,0,0.3);
+    display: none;
+    flex-direction: column;
+    text-align: center;
+    justify-content: space-evenly;
+}
+
+.Banca h2{
+    color: #1b3573;
+    font-weight: 500;
+    margin-top: 0px;
+    margin-bottom: -10px;
+}
+
+.input-valor{
+    justify-content: center;
+    height: 50px;
+    width: 100%;
+    display: flex;
+}
+
+.input-valor input{
+    height: 50px;
+    width: 200px;
+    border: none;
+    border-radius: 10px 0px 0px 10px;
+    text-indent: 20px;
+    font-size: 14px;
+    box-shadow: 0px 5px 5px rgba(0,0,0,0.3);
+}
+
+.input-valor input:focus{
+    outline: none;
+    transition: .2s;
+}
+
+.input-valor div{
+    color: #f3f3f3;
+    height: 52px;
+    width: 52px;
+    background-color: #1b3573;
+    border-radius: 0px 10px 10px 0px;
+    box-shadow: 0px 5px 5px rgba(0,0,0,0.3);
+}
+
+.input-valor div p{
+    margin-top: 12px;
+    font-size: 18px;
+    font-weight: 600;
+    user-select: none;
+}
+
+.valores-padrao{
+    width: 100%;
+    height: 100px;
+    display: grid;
+    grid-template-columns: repeat(3, 50px);
+    justify-content: center;
+    gap: 5px;
+}
+
+.valores-padrao a{
+    cursor: pointer;
+    height: 50px;
+    width: 50px;
+    background-color: #1b3573;
+    border-radius: 5px;
+    color: #f3f3f3;
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 45px;
+    user-select: none;
+}
+
+.deposito-actions{
+    display: flex;
+    justify-content: space-evenly;
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.deposito-actions div{
+    height: 48px;
+    width: 120px;
+    border-radius: 50px;
+    color: #f3f3f3;
+    font-size: 18px;
+    line-height: 45px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.deposito-actions .deposit{
+    background-color: #1b3573;
+}
+
+.deposito-actions .deposit:hover{
+    background-color: #4466b7;
+}
+
+
+.deposito-actions .cancel{
+    background-color: #9b1818;
+}
+
+.deposito-actions .cancel:hover{
+    background-color: #ec3636;
+}
+
+
+.valor-span{
+    margin: 5px;
+    font-size: 12px;
+    font-weight: 400;
+    color: #969696;
+}
+
+.span-valores{
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    width: 70%;
+    justify-content: center;
+    line-height: 3px;
+    margin-bottom: 5px;
+}
+
+.Aposta {
+    position: fixed;
+    bottom: -167px;
+    right: 20px;
+    width: 360px;
+    height: 217px;
+    background-color: #fff;
+    border-radius: 5px 5px 0px 0px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    transition: bottom 2s ease-out;
   }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+  
+  .Aposta.show {
+    bottom: 0px;
   }
-  to {
-    transform: rotate(360deg);
+
+  .header-aposta {
+    background-color: #1b3573;
+    width: 100%;
+    height: 48px;
+    border-radius: 5px 5px 0px 0px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    box-sizing: border-box;
   }
+  
+  .header-title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-grow: 1;
+    justify-content: center;
+  }
+  
+  .header-title div {
+    font-size: 20px;
+    font-weight: 400;
+    color: #fff;
+  }
+  
+  .header-title span {
+    text-align: center;
+    height: 16px;
+    width: 16px;
+    background-color: #4466b7;
+    border-radius: 2px;
+    color: #f3f3f3;
+    font-size: 10px;
+    font-weight: 500;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .expand-arrow {
+    cursor: pointer;
+    transition: transform 0.7s ease;
+  }
+  
+  .Aposta.show .expand-arrow {
+    transform: rotate(180deg);
+  }
+  
+  .compartilha-aposta{
+    margin-left: 240px;
+    height: 24px;
+    width: 105px;
+  }
+
+  .compartilha-aposta a{
+    color: #1b3573;
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .compartilha-aposta img{
+    margin-right: 5px;
+  }
+  
+  .resultado-aposta{
+    height: 80px;
+    border: 1px #d3d3d3;
+    border-style: solid none solid none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .mercado-deposito{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
+
+  .jogo-aposta{
+    width: 100%;
+    margin-left: 5px;
+    margin-top: 0;
+    font-size: 14px;
+    color: #1b3573;
+  }
+
+  .mercado-aposta{
+    margin-top: 14px;
+    margin-left: 5px;
+    margin-bottom: 0px;
+    line-height: 4px;
+  }
+
+.mercado-aposta b{
+    color: #1b3573;
 }
+
+  .mercado-aposta p{
+    font-size: 14px;
+    color: #4466b7;
+  }
+
+  .deposito-aposta{
+    display: flex;
+    margin-top: 5px;
+    margin-right: 5px;
+  }
+
+  .deposito-aposta .options{
+    gap: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .deposito-aposta .options b{
+    font-size: 13px;
+    color: #1b3573;
+  }
+
+
+  .deposito-aposta .input{
+    text-indent: 60%;
+    color: #1b3573;
+    height: 40px;
+    font-size: 14px;
+    font-weight: 700;
+    width: 90px;
+    border: 1px solid #1b3573;
+    margin-left: 5px;
+    border-radius: 5px;
+  }
+
+  .deposito-aposta .input:focus{
+    border: 1px solid #4466b7;
+  }
+
+  .confirmar-aposta{
+    margin: 10px;
+    width: auto;
+    text-align: center;
+    line-height: 40px;
+    font-size: 16px;
+    background-color: #1b3573;
+    color: #FFF;
+    border-radius: 5px;
+    height: 44px;
+    font-weight: 600;
+  }
