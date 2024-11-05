@@ -368,7 +368,7 @@
     background-color: #fff;
     border-radius: 5px 5px 0px 0px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-    transition: bottom 2s ease-out;
+    transition: bottom 1.2s ease-out;
   }
   
   .Aposta.show {
@@ -516,6 +516,7 @@
   }
 
   .confirmar-aposta{
+    cursor: pointer;
     margin: 10px;
     width: auto;
     text-align: center;
