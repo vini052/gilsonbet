@@ -1,6 +1,6 @@
 import React, { Component } from "react";
+import axios from "axios";
 import './App.css'
-import db from './db/db.json'
 import teamsData from './db/teams.json'
 
 const teamLogos = {
@@ -10,26 +10,25 @@ const teamLogos = {
 
 class Header extends Component {
   render() {
+    const { depositar, toggleApostasCriadas } = this.props;
+
     return (
       <div className="header">
         <img className="logo" src={require("./assets/GilsonBet.png")} alt="Gilson Bet Logo" />
         <ul className="Scroll-Sports">
           <li><a>Futebol</a></li>
           <li><a>Basquete</a></li>
-          <li><a>Volei</a></li>
-          <li><a>Tenis</a></li>
-          <li><a>Handebol</a></li>
-          <li><a>Baseball</a></li>
-          <li><a>Tenis de Mesa</a></li>
-          <li><a>Corrida de Cavalos</a></li>
-          <li><a>E-games</a></li>
         </ul>
-        <div className="deposito" onClick={this.props.depositar}><a>Depositar</a></div>
+        <div className="deposito" onClick={depositar}><a>Depositar</a></div>
+        <button className="apostas-criadas-btn" onClick={toggleApostasCriadas}>
+          Ver Apostas Criadas
+        </button>
         <Profile />
       </div>
     );
   }
 }
+
 
 class Profile extends Component {
   render() {
@@ -46,30 +45,89 @@ class Matches extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      jogos: db.jogos,
-      equipes: teamsData.equipes
+      jogos: [],
+      equipes: teamsData.equipes,
+      jogoSelecionado: null,
     };
   }
 
-  getTeamInfo(codigo) {
-    return this.state.equipes.find(team => team.codigo === codigo) || {};
+  componentDidMount() {
+    axios
+      .get('http://localhost:8080')
+      .then(response => {
+        this.setState({ jogos: response.data });
+        console.log("Jogos carregados do backend:", this.state.jogos);
+      })
+      .catch(error => {
+        console.error('Erro ao buscar os jogos do backend:', error.message);
+
+        // Fallback para carregar JSON local
+        import('./db/jogos.json')
+          .then(localData => {
+            this.setState({ jogos: localData.default });
+            console.log("Jogos carregados do arquivo local:", this.state.jogos);
+          })
+          .catch(err => console.error("Erro ao carregar JSON local:", err.message));
+      });
+}
+
+  getTeamInfo(teamId) {
+    return this.state.equipes.find(team => team.codigo === teamId) || {};
+  }
+
+  selecionarJogo(jogo) {
+    this.setState({ jogoSelecionado: jogo });
+  }
+
+  voltarParaLista() {
+    this.setState({ jogoSelecionado: null });
   }
 
   render() {
+    const { jogos, equipes, jogoSelecionado } = this.state;
+
+    if (jogoSelecionado) {
+      const mandante = this.getTeamInfo(jogoSelecionado.participant1);
+      const visitante = this.getTeamInfo(jogoSelecionado.participant2);
+
+      return (
+        <Jogo
+          id={jogoSelecionado.eventId}
+          jogo={jogoSelecionado}
+          mandante={mandante}
+          visitante={visitante}
+          voltar={() => this.voltarParaLista()}
+          exibirAposta={this.props.exibirAposta}
+        />
+      );
+    }
+
     return (
       <div className="Matches">
         {this.state.jogos.map((jogo, index) => {
-          const mandanteInfo = this.getTeamInfo(jogo.mandante);
-          const visitanteInfo = this.getTeamInfo(jogo.visitante);
+          const mandanteInfo = this.getTeamInfo(jogo.participant1); // Dados do time mandante
+          const visitanteInfo = this.getTeamInfo(jogo.participant2); // Dados do time visitante
 
           return (
-            <Game
+            <div
               key={index}
-              jogo={jogo}
-              mandante={mandanteInfo}
-              visitante={visitanteInfo}
-              exibirAposta={this.props.exibirAposta}
-            />
+              className="Game-Card"
+              onClick={() => this.selecionarJogo(jogo)}
+            >
+              <Game
+                jogo={{
+                  campeonato: "Brasileirão Série A", // Pode ser ajustado se for dinâmico
+                  data: jogo.date,
+                  hora: jogo.time,
+                  "odd-casa": jogo.odds.results[0], // Odd do mandante
+                  "odd-empate": jogo.odds.results[1], // Odd do empate
+                  "odd-fora": jogo.odds.results[2] // Odd do visitante
+                }}
+                mandante={mandanteInfo}
+                visitante={visitanteInfo}
+                exibirAposta={this.props.exibirAposta}
+              />
+            </div>
           );
         })}
       </div>
@@ -86,7 +144,7 @@ class Game extends Component {
       <div className="info-game">
         <div className="header-game">
           <div>
-            <img width="16" height="16" src="https://img.icons8.com/ios-glyphs/30/969696/football2--v1.png" alt="football2--v1" />
+            <img width="16" height="16" src="https://img.icons8.com/ios-glyphs/30/969696/football2--v1.png" alt="football icon" />
             <h2>{campeonato}</h2>
           </div>
           <h2>{data} / {hora}</h2>
@@ -94,19 +152,18 @@ class Game extends Component {
         <div className="vs-icons">
           <div className="time">
             <h3>{mandante.nome || 'Time Mandante'}</h3>
-            <img src={mandante.escudo} alt="escudo mandante" />
+            <img src={mandante.escudo || ''} alt="escudo mandante" />
           </div>
-          <span>1 - 0</span>
+          <span>VS</span>
           <div className="time">
-            <img src={visitante.escudo} alt="escudo visitante" />
+            <img src={visitante.escudo || ''} alt="escudo visitante" />
             <h3>{visitante.nome || 'Time Visitante'}</h3>
           </div>
         </div>
-        <div className="result"><span className="line-span"/><span className="resultado-partida">Resultado da Partida</span><span className="line-span"/></div>
         <div className="odds">
-          <div className="odd" onClick={() => this.props.exibirAposta()}><div>1</div> {oddCasa}</div>
-          <div className="odd" onClick={() => this.props.exibirAposta()}><div>X</div> {oddEmpate}</div>
-          <div className="odd" onClick={() => this.props.exibirAposta()}><div>2</div> {oddFora}</div>
+          <div className="odd"><div>1</div> {oddCasa}</div>
+          <div className="odd"><div>X</div> {oddEmpate}</div>
+          <div className="odd"><div>2</div> {oddFora}</div>
         </div>
       </div>
     );
@@ -146,13 +203,72 @@ class Deposito extends Component {
 }
 
 class Aposta extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      valorAposta: "", // Valor inserido pelo usuário
+    };
+  }
+
+  handleInputChange = (event) => {
+    const valor = event.target.value;
+    // Atualiza o estado com o valor inserido
+    this.setState({ valorAposta: valor });
+  };
+
+  enviarAposta = () => {
+    const { cupomSelecionado } = this.props;
+    const { valorAposta } = this.state;
+
+    if (!valorAposta || valorAposta <= 0) {
+      alert("Por favor, insira um valor válido para a aposta.");
+      return;
+    }
+
+    const dadosAposta = {
+      idJogo: cupomSelecionado.jogo.id, // ID do jogo
+      mercado: cupomSelecionado.mercado, // Mercado escolhido
+      odd: cupomSelecionado.odd, // Odd selecionada
+      valorApostado: parseFloat(valorAposta), // Valor inserido pelo usuário
+      retornos: (parseFloat(valorAposta) * parseFloat(cupomSelecionado.odd)).toFixed(2), // Retorno calculado
+    };
+
+    // Faz a requisição POST para o localhost
+    axios
+      .post("http://localhost:5000/aposta", dadosAposta)
+      .then((response) => {
+        console.log("Aposta enviada com sucesso:", response.data);
+        alert("Aposta registrada com sucesso!");
+      })
+      .catch((error) => {
+        console.error("Erro ao enviar a aposta:", error);
+        alert("Erro ao registrar a aposta. Tente novamente.");
+      });
+  };
+
   render() {
-    const { show, toggleAposta, cupomSelecionado } = this.props;
+    const { show, toggleAposta, cupomSelecionado, removerAposta } = this.props;
+    const { valorAposta } = this.state;
+
+    // Calcula os ganhos
+    const ganhos =
+      valorAposta && cupomSelecionado
+        ? (parseFloat(valorAposta) * parseFloat(cupomSelecionado.odd)).toFixed(2)
+        : 0;
 
     return (
       <div className={`Aposta ${show ? "show" : ""}`}>
         <div className="header-aposta">
-          {cupomSelecionado && (<img width="16" height="16" src="https://img.icons8.com/material-rounded/24/FFFFFF/trash.png" alt="trash" className="trash-icon"/>)}
+          {cupomSelecionado && (
+            <img
+              width="16"
+              height="16"
+              src="https://img.icons8.com/material-rounded/24/FFFFFF/trash.png"
+              alt="trash"
+              className="trash-icon"
+              onClick={removerAposta} // Remove o cupom
+            />
+          )}
           <div className="header-title">
             <div>Cupom</div>
             <span>{cupomSelecionado ? 1 : 0}</span>
@@ -166,15 +282,208 @@ class Aposta extends Component {
             onClick={toggleAposta}
           />
         </div>
-        <div className="compartilha-aposta"><img width="16" height="16" src="https://img.icons8.com/ios-filled/50/1B3573/forward-arrow.png" alt="forward-arrow"/><a>Compartilhar</a></div>
-        <div className="resultado-aposta"><div className="mercado-deposito"><div className="mercado-aposta"><b>Fortaleza</b><p>Resultado Final</p></div><div className="deposito-aposta"><div className="options"><b>2.28</b><img width="16" height="16" src="https://img.icons8.com/material-rounded/24/969696/trash.png" alt="trash" className="trash-icon"/></div><input placeholder="0.00" className="input" type="number"/></div></div><div className="jogo-aposta">Juventude - Fortaleza</div></div>
-        <div className="confirmar-aposta">Aposte já</div>
+        {cupomSelecionado && (
+          <div className="resultado-aposta">
+            <div className="mercado-deposito">
+              <div className="mercado-aposta">
+                <b>{cupomSelecionado.tipo}</b>
+                <p>{cupomSelecionado.mercado}</p>
+              </div>
+              <div className="deposito-aposta">
+                <div className="options">
+                  <b>{cupomSelecionado.odd}</b>
+                  <img
+                    width="16"
+                    height="16"
+                    src="https://img.icons8.com/material-rounded/24/969696/trash.png"
+                    alt="trash"
+                    className="trash-icon"
+                    onClick={removerAposta}
+                  />
+                </div>
+                {/* Input para o valor da aposta */}
+                <input
+                  placeholder="0.00"
+                  className="input"
+                  type="number"
+                  value={valorAposta}
+                  onChange={this.handleInputChange} // Monitora alterações no input
+                />
+              </div>
+            </div>
+            <div className="jogo-ganhos">
+              <div className="jogo-aposta">
+                {cupomSelecionado.jogo.mandante} - {cupomSelecionado.jogo.visitante}
+              </div>
+              {/* Mostra os ganhos se o valor da aposta for maior que 0 */}
+              {valorAposta > 0 && (
+                <div className="ganhos">
+                  Retornos: R$ {ganhos}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+        {/* Botão para confirmar a aposta */}
+        <div className="confirmar-aposta" onClick={this.enviarAposta}>
+          Aposte já
+        </div>
       </div>
     );
   }
 }
 
+class Jogo extends Component {
+  handleSelecionarOdd = (mercado, odd, tipo) => {
+    const { jogo, mandante, visitante } = this.props;
 
+    const cupom = {
+      mercado,
+      odd,
+      tipo,
+      jogo: {
+        id: jogo.eventId,
+        mandante: mandante.nome,
+        visitante: visitante.nome,
+        data: jogo.date,
+        hora: jogo.time
+      }
+    };
+
+    this.props.exibirAposta(cupom); // Passa os dados selecionados para o componente pai
+  };
+
+  render() {
+    const { jogo, mandante, visitante, voltar } = this.props;
+    const { date, time, odds } = jogo;
+
+    return (
+      <div className="Jogo-Tela">
+        <h1 className="Titulo-Tela">Selecione sua Aposta</h1>
+        <div className="Info-Tela">
+          <div className="Header-Tela">
+            <button onClick={voltar}>Voltar</button>
+            <a>{`${date} | ${time}`}</a>
+          </div>
+          <div className="Times-Tela">
+            <img src={mandante.escudo} alt="Mandante" />
+            <h4>
+              {mandante.nome || "Mandante"} - {visitante.nome || "Visitante"}
+            </h4>
+            <img src={visitante.escudo} alt="Visitante" />
+          </div>
+        </div>
+        <div className="Texto-Separador">
+          <div className="Linha-Tela"></div>
+          <div className="Mercado">Mercados</div>
+          <div className="Linha-Tela"></div>
+        </div>
+        <div className="Resultado-Tela">
+          <h4>Resultado Final</h4>
+          <div className="Odds-Resultado">
+            <div
+              className="oddResult"
+              onClick={() => this.handleSelecionarOdd("Resultado Final", odds.results[0], mandante.nome)}
+            >
+              <div>1</div> {odds.results[0]}
+            </div>
+            <div
+              className="oddResult"
+              onClick={() => this.handleSelecionarOdd("Resultado Final", odds.results[1], "Empate")}
+            >
+              <div>X</div> {odds.results[1]}
+            </div>
+            <div
+              className="oddResult"
+              onClick={() => this.handleSelecionarOdd("Resultado Final", odds.results[2], visitante.nome)}
+            >
+              <div>2</div> {odds.results[2]}
+            </div>
+          </div>
+        </div>
+        <div className="Ambos-Tela">
+          <h4>Ambos Times Marcam</h4>
+          <div className="Odds-BTTS">
+            <div
+              className="oddBTTS"
+              onClick={() => this.handleSelecionarOdd("Ambos Marcam", odds.btts[0], "Sim")}
+            >
+              <div>Sim</div> {odds.btts[0]}
+            </div>
+            <div
+              className="oddBTTS"
+              onClick={() => this.handleSelecionarOdd("Ambos Marcam", odds.btts[1], "Não")}
+            >
+              <div>Não</div> {odds.btts[1]}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+}
+
+class ApostasCriadas extends Component {
+  state = {
+    apostas: [],
+  };
+
+  componentDidMount() {
+    this.buscarApostas();
+  }
+
+  buscarApostas = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/apostas");
+      this.setState({ apostas: response.data });
+    } catch (error) {
+      console.error("Erro ao buscar apostas:", error.message);
+    }
+  };
+
+  deletarAposta = async (idJogo) => {
+    try {
+      await axios.delete(`http://localhost:5000/aposta/${idJogo}`);
+      this.buscarApostas();
+    } catch (error) {
+      console.error("Erro ao deletar aposta:", error.message);
+    }
+  };
+
+  render() {
+    const { apostas } = this.state;
+    const { voltar } = this.props;
+
+    return (
+      <div className="apostas-criadas">
+        <button className="voltar-btn" onClick={voltar}>
+          Voltar
+        </button>
+        <h2>Apostas Criadas</h2>
+        <div className="cards-container">
+          {apostas.length === 0 ? (
+            <p>Nenhuma aposta criada.</p>
+          ) : (
+            apostas.map((aposta) => (
+              <div key={aposta.idJogo} className="card">
+                <h3>
+                  {aposta.jogo.mandante} x {aposta.jogo.visitante}
+                </h3>
+                <p><b>Mercado:</b> {aposta.mercado}</p>
+                <p><b>Odd:</b> {aposta.odd}</p>
+                <p><b>Valor Apostado:</b> R$ {aposta.valor}</p>
+                <p><b>Retornos:</b> R$ {aposta.retornos.toFixed(2)}</p>
+                <button onClick={() => this.deletarAposta(aposta.idJogo)}>
+                  Deletar
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
+}
 
 
 class App extends Component {
@@ -183,7 +492,8 @@ class App extends Component {
     this.state = { 
       showDeposito: false, 
       showAposta: false, 
-      cupomSelecionado: false
+      showApostasCriadas: false, // Novo estado para controlar a tela de apostas criadas
+      cupomSelecionado: null // Armazena os dados do cupom selecionado
     };
   }
 
@@ -195,12 +505,18 @@ class App extends Component {
     this.setState({ showDeposito: false });
   };
 
-  exibirAposta = () => {
-    this.setState({ showAposta: true, cupomSelecionado: true });
+  exibirAposta = (cupom) => {
+    this.setState({ 
+      showAposta: true, 
+      cupomSelecionado: cupom // Define os dados do cupom selecionado
+    });
   };
 
   fecharAposta = () => {
-    this.setState({ showAposta: false, cupomSelecionado: false });
+    this.setState({ 
+      showAposta: false, 
+      cupomSelecionado: null 
+    });
   };
 
   toggleAposta = () => {
@@ -209,25 +525,42 @@ class App extends Component {
     }
   };
 
-  selecionarCupom = () => {
-    this.setState({ cupomSelecionado: true, showAposta: true });
+  // Novo método para alternar a exibição da tela de Apostas Criadas
+  toggleApostasCriadas = () => {
+    this.setState((prevState) => ({
+      showApostasCriadas: !prevState.showApostasCriadas,
+    }));
   };
 
   render() {
+    const { showDeposito, showAposta, showApostasCriadas, cupomSelecionado } = this.state;
+
     return (
       <div className="container">
-        <Header depositar={this.depositar} />
-        <Matches exibirAposta={this.exibirAposta}/>
-        <Deposito show={this.state.showDeposito} fecharDeposito={this.fecharDeposito} />
-        <Aposta
-          show={this.state.showAposta}
-          toggleAposta={this.toggleAposta}
-          cupomSelecionado={this.state.cupomSelecionado}
+        <Header 
+          depositar={this.depositar} 
+          toggleApostasCriadas={this.toggleApostasCriadas} // Passa o método para o Header
         />
+        {!showApostasCriadas ? (
+          <>
+            <Matches exibirAposta={this.exibirAposta} />
+            <Deposito show={showDeposito} fecharDeposito={this.fecharDeposito} />
+            <Aposta
+              show={showAposta}
+              toggleAposta={this.toggleAposta}
+              cupomSelecionado={cupomSelecionado}
+              removerAposta={this.fecharAposta}
+            />
+          </>
+        ) : (
+          <ApostasCriadas voltar={this.toggleApostasCriadas} /> // Mostra a tela de apostas criadas
+        )}
       </div>
     );
   }
 }
+
+
 
 
 export default App;

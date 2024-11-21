@@ -1,102 +1,102 @@
 {
     "equipes": [
         {
-            "codigo": 1974,
+            "codigo": "Vasco da Gama RJ",
             "nome": "Vasco",
             "escudo": "https://static.wixstatic.com/media/29c778_f3d6773ce1634fc7b1c7e58ce9755b7e~mv2.png/v1/fit/w_500,h_500,q_90/29c778_f3d6773ce1634fc7b1c7e58ce9755b7e~mv2.webp"
         },
         {
-            "codigo": 1955,
+            "codigo": "EC Bahia BA",
             "nome": "Bahia",
             "escudo": "https://static.wixstatic.com/media/29c778_57234607199b4ad8911a5bd42865b13d~mv2.png/v1/fit/w_500,h_500,q_90/29c778_57234607199b4ad8911a5bd42865b13d~mv2.png"
         },
         {
-            "codigo": 1958,
+            "codigo": "Botafogo RJ",
             "nome": "Botafogo",
             "escudo": "https://static.wixstatic.com/media/29c778_888dbc9a928f4d0894c37b6a232b993e~mv2.png/v1/fit/w_31,h_500,q_90/29c778_888dbc9a928f4d0894c37b6a232b993e~mv2.png"
         },
         {
-            "codigo": 2020,
+            "codigo": "Fortaleza CE",
             "nome": "Fortaleza",
             "escudo": "https://static.wixstatic.com/media/29c778_ff7cb6559d184e82bfa4941bb2f7d8ea~mv2.png/v1/fit/w_181,h_500,q_90/29c778_ff7cb6559d184e82bfa4941bb2f7d8ea~mv2.png"
         },
         {
-            "codigo": 1980,
+            "codigo": "Juventude RS",
             "nome": "Juventude",
             "escudo": "https://static.wixstatic.com/media/29c778_12d3d43160854f8b885c9d704c76ed87~mv2.png/v1/fit/w_181,h_500,q_90/29c778_12d3d43160854f8b885c9d704c76ed87~mv2.png"
         },
         {
-            "codigo": 1963,
+            "codigo": "Palmeiras SP",
             "nome": "Palmeiras",
             "escudo": "https://static.wixstatic.com/media/29c778_22d25f5604e348dc8289c810238ce4d3~mv2.png/v1/fit/w_181,h_500,q_90/29c778_22d25f5604e348dc8289c810238ce4d3~mv2.png"
         },
         {
-            "codigo":7314,
+            "codigo":"Atletico GO",
             "nome":"Atlético-GO",
             "escudo":"https://static.wixstatic.com/media/29c778_be2645553ac74851b3b4f0bcecd4bff0~mv2.png/v1/fit/w_500,h_500,q_90/29c778_be2645553ac74851b3b4f0bcecd4bff0~mv2.png"
         },
         {
-            "codigo": 1967,
+            "codigo": "Athletico PR",
             "nome": "Athletico-PR",
             "escudo": "https://static.wixstatic.com/media/29c778_5b9c1928968f40759013de41fcafdfcb~mv2.png/v1/fit/w_500,h_500,q_90/29c778_5b9c1928968f40759013de41fcafdfcb~mv2.png"
         },
         {
-            "codigo": 1977,
+            "codigo": "Clube Atletico MG",
             "nome": "Atlético-MG",
             "escudo": "https://static.wixstatic.com/media/29c778_dc8eafdf136d4154ae36340df2a81f3e~mv2.png/v1/fit/w_500,h_500,q_90/29c778_dc8eafdf136d4154ae36340df2a81f3e~mv2.png"
         },
         {
-            "codigo": 1957,
+            "codigo": "Corinthians SP",
             "nome": "Corinthians",
             "escudo": "https://static.wixstatic.com/media/29c778_9e9c69fafce641ae8608994e6f36a51b~mv2.png/v1/fit/w_500,h_500,q_90/29c778_9e9c69fafce641ae8608994e6f36a51b~mv2.png"
         },
         {
-            "codigo": 1984,
+            "codigo": "Criciuma SC",
             "nome": "Criciúma",
             "escudo": "https://static.wixstatic.com/media/29c778_323eb6737a4f40c987abcf11ac3e867d~mv2.png/v1/fit/w_500,h_500,q_90/29c778_323eb6737a4f40c987abcf11ac3e867d~mv2.png"
         },
         {
-            "codigo": 1954,
+            "codigo": "Cruzeiro MG",
             "nome": "Cruzeiro",
             "escudo": "https://static.wixstatic.com/media/29c778_b1fd820f77c144efb0646f8dda173685~mv2.png/v1/fit/w_500,h_500,q_90/29c778_b1fd820f77c144efb0646f8dda173685~mv2.png"
         },
         {
-            "codigo": 1958,
+            "codigo": "Cuiaba MT",
             "nome": "Cuiabá",
             "escudo": "https://static.wixstatic.com/media/29c778_49271988a9214e92ab04c0afa4bee630~mv2.png/v1/fit/w_500,h_500,q_90/29c778_49271988a9214e92ab04c0afa4bee630~mv2.png"
         },
         {
-            "codigo": 5981,
+            "codigo": "Flamengo RJ",
             "nome":"Flamengo",
             "escudo":"https://static.wixstatic.com/media/29c778_42a1f46bcbe8412e8fdb8da12d0f654d~mv2.png/v1/fit/w_512,h_512,q_90/29c778_42a1f46bcbe8412e8fdb8da12d0f654d~mv2.png"
         },
         {
-            "codigo": 1961,
+            "codigo": "Fluminense RJ",
             "nome": "Fluminense",
             "escudo": "https://static.wixstatic.com/media/29c778_a5dad38430c44511afdb0074c5a5bb7b~mv2.png/v1/fit/w_500,h_500,q_90/29c778_a5dad38430c44511afdb0074c5a5bb7b~mv2.png"
         },
         {
-            "codigo": 5926,
+            "codigo": "Gremio RS",
             "nome": "Grêmio",
             "escudo": "https://static.wixstatic.com/media/29c778_c3f8f8d7fa614f49b0dd0d71f0a44272~mv2.png/v1/fit/w_500,h_500,q_90/29c778_c3f8f8d7fa614f49b0dd0d71f0a44272~mv2.png"
         },
         {
-            "codigo": 1966,
+            "codigo": "Internacional RS",
             "nome": "Internacional",
             "escudo": "https://static.wixstatic.com/media/29c778_4d4acc7534f84343b452618b76ad3c01~mv2.png/v1/fit/w_500,h_500,q_90/29c778_4d4acc7534f84343b452618b76ad3c01~mv2.png"
         },
         {
-            "codigo": 1999,
+            "codigo": "Bragantino SP",
             "nome": "RB Bragantino",
             "escudo": "https://static.wixstatic.com/media/29c778_ab7d319eb46d425dbe8eb9d47c76b56d~mv2.png/v1/fit/w_500,h_500,q_90/29c778_ab7d319eb46d425dbe8eb9d47c76b56d~mv2.png"
         },
         {
-            "codigo": 1981,
+            "codigo": "Sao Paulo SP",
             "nome": "São Paulo",
             "escudo": "https://static.wixstatic.com/media/29c778_29fa8884c14f4c12b0d323210f7d6267~mv2.png/v1/fit/w_500,h_500,q_90/29c778_29fa8884c14f4c12b0d323210f7d6267~mv2.png"
         },
         {
-            "codigo":1962,
+            "codigo":"Vitoria BA",
             "nome":"Vitória",
             "escudo":"https://static.wixstatic.com/media/29c778_fdc94bcbe11a4353aad4c89423a8fad9~mv2.png/v1/fit/w_500,h_500,q_90/29c778_fdc94bcbe11a4353aad4c89423a8fad9~mv2.png"
         }

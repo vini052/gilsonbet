@@ -1,0 +1,15 @@
+[
+    {
+      "date": "2024-11-24",
+      "participant1": "Sao Paulo SP",
+      "participant1Id": 89,
+      "participant2": "Clube Atletico MG",
+      "participant2Id": 1516,
+      "time": "00:30:00",
+      "odds": {
+        "results": [1.75, 3.6, 4.8],
+        "btts": [2.15, 1.65]
+      },
+      "eventId" : "id100032548215143"
+    }
+  ]
