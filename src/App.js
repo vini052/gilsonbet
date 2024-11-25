@@ -227,13 +227,18 @@ class Aposta extends Component {
 
   handleInputChange = (event) => {
     const valor = event.target.value;
-    // Atualiza o estado com o valor inserido
     this.setState({ valorAposta: valor });
   };
 
+  apagarAposta = () => {
+    const {removerAposta} = this.props;
+    this.setState({ valorAposta: "" }); // Zera o valor do campo
+    removerAposta(); 
+  }
+
   enviarAposta = () => {
-    const { cupomSelecionado } = this.props;
-    const { valorAposta } = this.state;
+    const { cupomSelecionado, removerAposta } = this.props;
+    const { valorAposta} = this.state;
 
     if (!valorAposta || valorAposta <= 0) {
       alert("Por favor, insira um valor válido para a aposta.");
@@ -241,19 +246,21 @@ class Aposta extends Component {
     }
 
     const dadosAposta = {
-      idJogo: cupomSelecionado.jogo.id, // ID do jogo
-      mercado: cupomSelecionado.mercado, // Mercado escolhido
-      odd: cupomSelecionado.odd, // Odd selecionada
-      valorApostado: parseFloat(valorAposta), // Valor inserido pelo usuário
-      retornos: (parseFloat(valorAposta) * parseFloat(cupomSelecionado.odd)).toFixed(2), // Retorno calculado
+      idJogo: cupomSelecionado.jogo.id,
+      mercado: cupomSelecionado.mercado,
+      odd: cupomSelecionado.odd,
+      valorApostado: parseFloat(valorAposta),
+      retornos: (parseFloat(valorAposta) * parseFloat(cupomSelecionado.odd)).toFixed(2),
     };
 
-    // Faz a requisição POST para o localhost
+    // Faz a requisição POST para o backend
     axios
       .post("http://localhost:5000/aposta", dadosAposta)
       .then((response) => {
         console.log("Aposta enviada com sucesso:", response.data);
         alert("Aposta registrada com sucesso!");
+        this.setState({ valorAposta: "" }); // Zera o valor do campo
+        removerAposta();
       })
       .catch((error) => {
         console.error("Erro ao enviar a aposta:", error);
@@ -281,7 +288,7 @@ class Aposta extends Component {
               src="https://img.icons8.com/material-rounded/24/FFFFFF/trash.png"
               alt="trash"
               className="trash-icon"
-              onClick={removerAposta} // Remove o cupom
+              onClick={this.apagarAposta}
             />
           )}
           <div className="header-title">
@@ -313,7 +320,7 @@ class Aposta extends Component {
                     src="https://img.icons8.com/material-rounded/24/969696/trash.png"
                     alt="trash"
                     className="trash-icon"
-                    onClick={removerAposta}
+                    onClick={this.apagarAposta}
                   />
                 </div>
                 {/* Input para o valor da aposta */}
@@ -322,7 +329,7 @@ class Aposta extends Component {
                   className="input"
                   type="number"
                   value={valorAposta}
-                  onChange={this.handleInputChange} // Monitora alterações no input
+                  onChange={this.handleInputChange}
                 />
               </div>
             </div>
@@ -330,16 +337,12 @@ class Aposta extends Component {
               <div className="jogo-aposta">
                 {cupomSelecionado.jogo.mandante} - {cupomSelecionado.jogo.visitante}
               </div>
-              {/* Mostra os ganhos se o valor da aposta for maior que 0 */}
               {valorAposta > 0 && (
-                <div className="ganhos">
-                  Retornos: R$ {ganhos}
-                </div>
+                <div className="ganhos">Retornos: R$ {ganhos}</div>
               )}
             </div>
           </div>
         )}
-        {/* Botão para confirmar a aposta */}
         <div className="confirmar-aposta" onClick={this.enviarAposta}>
           Aposte já
         </div>
@@ -347,6 +350,7 @@ class Aposta extends Component {
     );
   }
 }
+
 
 class Jogo extends Component {
   handleSelecionarOdd = (mercado, odd, tipo) => {
@@ -474,6 +478,26 @@ class ApostasCriadas extends Component {
       });
   }
 
+  deletarAposta = (id) => {
+    if (window.confirm("Tem certeza que deseja deletar esta aposta?")) {
+      axios
+        .delete(`http://localhost:5000/aposta/${id}`)
+        .then(() => {
+          alert("Aposta deletada com sucesso!");
+          // Atualiza o estado removendo a aposta deletada
+          this.setState((prevState) => ({
+            apostasComDetalhes: prevState.apostasComDetalhes.filter(
+              (aposta) => aposta.id !== id
+            ),
+          }));
+        })
+        .catch((error) => {
+          console.error("Erro ao deletar a aposta:", error.message);
+          alert("Não foi possível deletar a aposta. Tente novamente.");
+        });
+    }
+  };
+
   render() {
     const { apostasComDetalhes } = this.state;
 
@@ -485,7 +509,7 @@ class ApostasCriadas extends Component {
           <p>Nenhuma aposta encontrada.</p>
         ) : (
           <div className="Apostas-Criadas">
-            {apostasComDetalhes.map((aposta, index) => {
+            {apostasComDetalhes.map((aposta) => {
               const {
                 mercado,
                 odd,
@@ -504,6 +528,7 @@ class ApostasCriadas extends Component {
                     <p>Dinheiro Apostado: {valorApostado}</p>
                     <p>Ganhos Potenciais: {retornos}</p>
                     <p>Detalhes do jogo não encontrados.</p>
+                    <button onClick={() => this.deletarAposta(id)}>Deletar</button>
                   </div>
                 );
               }
@@ -526,6 +551,7 @@ class ApostasCriadas extends Component {
                   <p>Odd: {odd}</p>
                   <p>Dinheiro Apostado: {valorApostado}</p>
                   <p>Ganhos Potenciais: {retornos}</p>
+                  <button onClick={() => this.deletarAposta(id)}>Deletar</button>
                 </div>
               );
             })}
@@ -546,10 +572,10 @@ class App extends Component {
     this.state = { 
       showDeposito: false, 
       showAposta: false, 
-      showApostasCriadas: false, // Novo estado para controlar a tela de apostas criadas
-      cupomSelecionado: null, // Armazena os dados do cupom selecionado
-      apostas: [], // Lista de apostas criadas
-      jogos: [] // Lista de jogos carregados
+      showApostasCriadas: false, 
+      cupomSelecionado: null, 
+      apostas: [], 
+      jogos: [] 
     };
   }
 
@@ -564,7 +590,7 @@ class App extends Component {
   exibirAposta = (cupom) => {
     this.setState({ 
       showAposta: true, 
-      cupomSelecionado: cupom // Define os dados do cupom selecionado
+      cupomSelecionado: cupom 
     });
   };
 
@@ -581,21 +607,18 @@ class App extends Component {
     }
   };
 
-  // Novo método para alternar a exibição da tela de Apostas Criadas
   toggleApostasCriadas = () => {
     this.setState((prevState) => ({
       showApostasCriadas: !prevState.showApostasCriadas,
     }));
   };
 
-  // Método para salvar uma nova aposta
   adicionarAposta = (aposta) => {
     this.setState((prevState) => ({
       apostas: [...prevState.apostas, aposta],
     }));
   };
 
-  // Método para carregar jogos na inicialização
   carregarJogos = (jogos) => {
     this.setState({ jogos });
   };
@@ -607,7 +630,7 @@ class App extends Component {
       <div className="container">
         <Header 
           depositar={this.depositar} 
-          toggleApostasCriadas={this.toggleApostasCriadas} // Passa o método para o Header
+          toggleApostasCriadas={this.toggleApostasCriadas}
         />
         {!showApostasCriadas ? (
           <>
@@ -627,12 +650,13 @@ class App extends Component {
         ) : (
           <ApostasCriadas 
             voltar={this.toggleApostasCriadas} 
-            jogos={jogos} // Passa os jogos carregados no estado do App
-          />// Mostra a tela de apostas criadas
+            jogos={jogos} 
+          />
         )}
       </div>
     );
   }
 }
+
 
 export default App;
