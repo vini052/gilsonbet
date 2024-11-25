@@ -748,3 +748,16 @@
     font-weight: 400;
     display: flex;
   }
+
+  .Apostas-Criadas{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .Apostas-Card{
+    background-color: #f3f3f3;
+    width: 300px;
+    height: 200px;
+    border-radius: 20px;
+    box-shadow: 5px 5px 5px rgba(1, 1, 1, .2);
+  }

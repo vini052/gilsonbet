@@ -56,6 +56,7 @@ class Matches extends Component {
       .get('http://localhost:8080')
       .then(response => {
         this.setState({ jogos: response.data });
+        this.props.carregarJogos(response.data); // Passa os jogos para o estado do App
         console.log("Jogos carregados do backend:", this.state.jogos);
       })
       .catch(error => {
@@ -65,11 +66,12 @@ class Matches extends Component {
         import('./db/jogos.json')
           .then(localData => {
             this.setState({ jogos: localData.default });
+            this.props.carregarJogos(localData.default); // Passa os jogos para o estado do App
             console.log("Jogos carregados do arquivo local:", this.state.jogos);
           })
           .catch(err => console.error("Erro ao carregar JSON local:", err.message));
       });
-}
+  }
 
   getTeamInfo(teamId) {
     return this.state.equipes.find(team => team.codigo === teamId) || {};
@@ -81,6 +83,19 @@ class Matches extends Component {
 
   voltarParaLista() {
     this.setState({ jogoSelecionado: null });
+  }
+
+  adicionarAposta(jogo, mercado, odd, dinheiro) {
+    const ganhos = (odd * dinheiro).toFixed(2); // Calcula os ganhos possíveis
+    const aposta = {
+      idJogo: jogo.eventId,
+      mercado,
+      odd,
+      dinheiro,
+      ganhos,
+    };
+    this.props.adicionarAposta(aposta); // Adiciona a aposta no estado do App
+    this.voltarParaLista(); // Retorna à lista de jogos
   }
 
   render() {
@@ -98,15 +113,16 @@ class Matches extends Component {
           visitante={visitante}
           voltar={() => this.voltarParaLista()}
           exibirAposta={this.props.exibirAposta}
+          adicionarAposta={(mercado, odd, dinheiro) => this.adicionarAposta(jogoSelecionado, mercado, odd, dinheiro)}
         />
       );
     }
 
     return (
       <div className="Matches">
-        {this.state.jogos.map((jogo, index) => {
-          const mandanteInfo = this.getTeamInfo(jogo.participant1); // Dados do time mandante
-          const visitanteInfo = this.getTeamInfo(jogo.participant2); // Dados do time visitante
+        {jogos.map((jogo, index) => {
+          const mandanteInfo = this.getTeamInfo(jogo.participant1);
+          const visitanteInfo = this.getTeamInfo(jogo.participant2);
 
           return (
             <div
@@ -116,16 +132,15 @@ class Matches extends Component {
             >
               <Game
                 jogo={{
-                  campeonato: "Brasileirão Série A", // Pode ser ajustado se for dinâmico
+                  campeonato: "Brasileirão Série A",
                   data: jogo.date,
                   hora: jogo.time,
-                  "odd-casa": jogo.odds.results[0], // Odd do mandante
-                  "odd-empate": jogo.odds.results[1], // Odd do empate
-                  "odd-fora": jogo.odds.results[2] // Odd do visitante
+                  "odd-casa": jogo.odds.results[0],
+                  "odd-empate": jogo.odds.results[1],
+                  "odd-fora": jogo.odds.results[2]
                 }}
                 mandante={mandanteInfo}
                 visitante={visitanteInfo}
-                exibirAposta={this.props.exibirAposta}
               />
             </div>
           );
@@ -424,66 +439,105 @@ class Jogo extends Component {
 }
 
 class ApostasCriadas extends Component {
-  state = {
-    apostas: [],
-  };
-
-  componentDidMount() {
-    this.buscarApostas();
+  constructor(props) {
+    super(props);
+    this.state = {
+      apostas: [], // Apostas carregadas do backend
+      apostasComDetalhes: [], // Apostas com os detalhes cruzados dos jogos
+    };
   }
 
-  buscarApostas = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/apostas");
-      this.setState({ apostas: response.data });
-    } catch (error) {
-      console.error("Erro ao buscar apostas:", error.message);
-    }
-  };
+  componentDidMount() {
+    // Faz o GET no endpoint para buscar as apostas
+    axios
+      .get("http://localhost:5000/apostas")
+      .then((response) => {
+        const apostas = response.data;
+        const { jogos } = this.props; // Jogos vindos do estado de App via props
 
-  deletarAposta = async (idJogo) => {
-    try {
-      await axios.delete(`http://localhost:5000/aposta/${idJogo}`);
-      this.buscarApostas();
-    } catch (error) {
-      console.error("Erro ao deletar aposta:", error.message);
-    }
-  };
+        // Cruza as apostas com os jogos usando o idJogo
+        const apostasComDetalhes = apostas.map((aposta) => {
+          const jogoRelacionado = jogos.find(
+            (jogo) => jogo.eventId === aposta.idJogo
+          );
+
+          return {
+            ...aposta,
+            jogo: jogoRelacionado || null, // Adiciona os detalhes do jogo ou null se não encontrar
+          };
+        });
+
+        this.setState({ apostas, apostasComDetalhes });
+      })
+      .catch((error) => {
+        console.error("Erro ao buscar as apostas do backend:", error.message);
+      });
+  }
 
   render() {
-    const { apostas } = this.state;
-    const { voltar } = this.props;
+    const { apostasComDetalhes } = this.state;
 
     return (
-      <div className="apostas-criadas">
-        <button className="voltar-btn" onClick={voltar}>
-          Voltar
-        </button>
+      <div className="ApostasCriadas">
+        <button onClick={this.props.voltar}>Voltar</button>
         <h2>Apostas Criadas</h2>
-        <div className="cards-container">
-          {apostas.length === 0 ? (
-            <p>Nenhuma aposta criada.</p>
-          ) : (
-            apostas.map((aposta) => (
-              <div key={aposta.idJogo} className="card">
-                <h3>
-                  {aposta.jogo.mandante} x {aposta.jogo.visitante}
-                </h3>
-                <p><b>Mercado:</b> {aposta.mercado}</p>
-                <p><b>Odd:</b> {aposta.odd}</p>
-                <p><b>Valor Apostado:</b> R$ {aposta.valor}</p>
-                <p><b>Retornos:</b> R$ {aposta.retornos.toFixed(2)}</p>
-                <button onClick={() => this.deletarAposta(aposta.idJogo)}>
-                  Deletar
-                </button>
-              </div>
-            ))
-          )}
-        </div>
+        {apostasComDetalhes.length === 0 ? (
+          <p>Nenhuma aposta encontrada.</p>
+        ) : (
+          <div className="Apostas-Criadas">
+            {apostasComDetalhes.map((aposta, index) => {
+              const {
+                mercado,
+                odd,
+                valorApostado, // Corrigido para acessar valorApostado
+                retornos, // Corrigido para acessar retornos
+                jogo,
+                id,
+              } = aposta;
+
+              if (!jogo) {
+                return (
+                  <div key={id} className="Apostas-Card">
+                    <p>Evento ID: {aposta.idJogo}</p>
+                    <p>Mercado: {mercado}</p>
+                    <p>Odd: {odd}</p>
+                    <p>Dinheiro Apostado: {valorApostado}</p>
+                    <p>Ganhos Potenciais: {retornos}</p>
+                    <p>Detalhes do jogo não encontrados.</p>
+                  </div>
+                );
+              }
+
+              const mandante = jogo.participant1;
+              const visitante = jogo.participant2;
+
+              return (
+                <div key={id} className="Apostas-Card">
+                  <div className="Aposta-Info">
+                    <div className="Data-Hora">
+                      <p>Data: {jogo.date}</p>
+                      <p>Hora: {jogo.time}</p></div>
+                    <p>{mandante} vs {visitante}</p>
+                  </div>
+                  <div>
+                  <p>São Paulo</p>
+                  <p>Mercado: {mercado}</p>
+                  </div>
+                  <p>Odd: {odd}</p>
+                  <p>Dinheiro Apostado: {valorApostado}</p>
+                  <p>Ganhos Potenciais: {retornos}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }
 }
+
+
+
 
 
 class App extends Component {
@@ -493,7 +547,9 @@ class App extends Component {
       showDeposito: false, 
       showAposta: false, 
       showApostasCriadas: false, // Novo estado para controlar a tela de apostas criadas
-      cupomSelecionado: null // Armazena os dados do cupom selecionado
+      cupomSelecionado: null, // Armazena os dados do cupom selecionado
+      apostas: [], // Lista de apostas criadas
+      jogos: [] // Lista de jogos carregados
     };
   }
 
@@ -532,8 +588,20 @@ class App extends Component {
     }));
   };
 
+  // Método para salvar uma nova aposta
+  adicionarAposta = (aposta) => {
+    this.setState((prevState) => ({
+      apostas: [...prevState.apostas, aposta],
+    }));
+  };
+
+  // Método para carregar jogos na inicialização
+  carregarJogos = (jogos) => {
+    this.setState({ jogos });
+  };
+
   render() {
-    const { showDeposito, showAposta, showApostasCriadas, cupomSelecionado } = this.state;
+    const { showDeposito, showAposta, showApostasCriadas, cupomSelecionado, apostas, jogos } = this.state;
 
     return (
       <div className="container">
@@ -543,7 +611,11 @@ class App extends Component {
         />
         {!showApostasCriadas ? (
           <>
-            <Matches exibirAposta={this.exibirAposta} />
+            <Matches 
+              exibirAposta={this.exibirAposta} 
+              adicionarAposta={this.adicionarAposta}
+              carregarJogos={this.carregarJogos}
+            />
             <Deposito show={showDeposito} fecharDeposito={this.fecharDeposito} />
             <Aposta
               show={showAposta}
@@ -553,14 +625,14 @@ class App extends Component {
             />
           </>
         ) : (
-          <ApostasCriadas voltar={this.toggleApostasCriadas} /> // Mostra a tela de apostas criadas
+          <ApostasCriadas 
+            voltar={this.toggleApostasCriadas} 
+            jogos={jogos} // Passa os jogos carregados no estado do App
+          />// Mostra a tela de apostas criadas
         )}
       </div>
     );
   }
 }
-
-
-
 
 export default App;
